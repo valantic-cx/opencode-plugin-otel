@@ -122,14 +122,12 @@ chore(deps): bump @opentelemetry/api to 1.10.0
 
 ## Releasing
 
-Releases are handled via GitHub Actions. See [the release workflow](.github/workflows/release.yml). To cut a release, push a version tag:
+Releases are automated with [release-please](https://github.com/googleapis/release-please) via
+[the release-please workflow](.github/workflows/release-please.yml). On every push to `main` it opens or
+updates a release PR that bumps the version and updates `CHANGELOG.md`. Merging that PR tags the
+release and publishes the package to npm.
 
-```bash
-git tag v2.1.0
-git push origin v2.1.0
-```
-
-The version bump should follow [SemVer](https://semver.org) based on the commits since the last release:
+The version bump follows [SemVer](https://semver.org) based on the commits since the last release:
 
 - `fix` commits → patch (`2.0.x`)
 - `feat` commits → minor (`2.x.0`)
