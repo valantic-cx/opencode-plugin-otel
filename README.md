@@ -4,7 +4,6 @@
 [![npm downloads](https://img.shields.io/npm/dm/@valantic-cx/opencode-plugin-otel.svg)](https://www.npmjs.com/package/@valantic-cx/opencode-plugin-otel)
 [![GitHub stars](https://img.shields.io/github/stars/valantic-cx/opencode-plugin-otel.svg)](https://github.com/valantic-cx/opencode-plugin-otel/stargazers)
 [![Build status](https://img.shields.io/github/actions/workflow/status/valantic-cx/opencode-plugin-otel/release-please.yml?branch=main)](https://github.com/valantic-cx/opencode-plugin-otel/actions/workflows/release-please.yml)
-[![Discord notifications](https://img.shields.io/badge/discord-notifications-5865F2?logo=discord&logoColor=white)](https://discord.gg/zavuskz8xB)
 [![License](https://img.shields.io/npm/l/@valantic-cx/opencode-plugin-otel.svg)](https://github.com/valantic-cx/opencode-plugin-otel/blob/main/LICENSE)
 
 > **Fork notice.** `@valantic-cx/opencode-plugin-otel` is a fork of
@@ -37,7 +36,6 @@ An [opencode](https://opencode.ai) plugin that exports telemetry via OpenTelemet
   - [Honeycomb example](#honeycomb-example)
   - [Claude Code dashboard compatibility](#claude-code-dashboard-compatibility)
 - [Local development](#local-development)
-- [GitHub Discord notifications](#github-discord-notifications)
 
 ## OpenCode compatibility
 
@@ -406,45 +404,3 @@ export OPENCODE_METRIC_PREFIX=claude_code.
 ## Local development
 
 See [CONTRIBUTING.md](./CONTRIBUTING.md).
-
-## GitHub Discord notifications
-
-This repo includes a reusable workflow at `.github/workflows/discord-notify.yml` that posts a Discord embed for supported GitHub events. The included `.github/workflows/discord-events.yml` file wires it up for:
-
-- `issues.opened`
-- `pull_request.opened`
-- `release.published`
-
-Set an org or repo secret named `DISCORD_WEBHOOK` and the workflow will post to that webhook automatically.
-
-To reuse it from another repository in the `valantic-cx` org:
-
-```yaml
-name: Discord Events
-
-on:
-  issues:
-    types: [opened]
-  pull_request:
-    types: [opened]
-  release:
-    types: [published]
-
-jobs:
-  notify-discord:
-    uses: valantic-cx/opencode-plugin-otel/.github/workflows/discord-notify.yml@main
-    with:
-      username: DEVtheOPS Bot
-      title_prefix: "[DEVtheOPS]"
-      include_body: true
-    secrets:
-      discord_webhook: ${{ secrets.DISCORD_WEBHOOK }}
-```
-
-Available workflow inputs:
-
-- `username`: webhook display name
-- `avatar_url`: webhook avatar image URL
-- `title_prefix`: optional title prefix for the embed
-- `include_body`: include the issue, PR, or release body in the card
-- `color`: fallback embed color for unsupported events
