@@ -129,7 +129,9 @@ resource attribute, metric prefix, or signal option fails setup rather than
 exporting one location's data using another location's settings. `spanAttributes`
 is the exception: each location may set its own, and they are applied to sessions
 of that location's project. If two locations of the same project disagree, the most
-recently loaded one wins and a warning is logged. Event attributes
+recently loaded one wins and a warning is logged. An `otlpHeadersHelper` is compared by the
+headers it returns, not by its path, so per-project copies of the same helper (for example
+`${PROJECT_ROOT}/.ai/scripts/...`) are accepted when they produce the same headers. Event attributes
 use the observed session's project ID when available. Shared event processing is
 serialized so an asynchronous session lookup cannot reorder step start/end events.
 

@@ -1,6 +1,9 @@
 import { describe, test, expect } from "bun:test"
+import { mkdtemp, rm } from "node:fs/promises"
+import { tmpdir } from "node:os"
+import { join } from "node:path"
 import { loadConfig } from "../src/config.ts"
-import { acquireSharedOtel, configKey, createFlushScheduler } from "../src/state.ts"
+import { acquireSharedOtel, configKey, createFlushScheduler, resolveConfigKey } from "../src/state.ts"
 import { makeCtx } from "./helpers.ts"
 import { consumeEvents, contextForSession, enqueueEvent, markSeen } from "../src/util.ts"
 import type { HandlerContext } from "../src/types.ts"
@@ -24,6 +27,32 @@ describe("multi-location telemetry", () => {
       expect(fake.refs).toBe(2)
     } finally {
       globals[key] = previous
+    }
+  })
+
+  test("compares headers helpers by their output instead of their path", async () => {
+    const dir = await mkdtemp(join(tmpdir(), "otel-helper-"))
+    const helper = async (name: string, token: string) => {
+      const path = join(dir, name)
+      await Bun.write(path, `#!/bin/sh\nprintf '%s' '{"Authorization":"Basic ${token}"}'\n`)
+      await Bun.spawn(["chmod", "+x", path]).exited
+      return path
+    }
+    const key = "__opencode_plugin_otel_shared__"
+    const globals = globalThis as Record<string, unknown>
+    const previous = globals[key]
+    try {
+      const first = loadConfig({ enabled: true, otlpHeadersHelper: await helper("one.sh", "same") })
+      const second = loadConfig({ enabled: true, otlpHeadersHelper: await helper("two.sh", "same") })
+      const other = loadConfig({ enabled: true, otlpHeadersHelper: await helper("three.sh", "other") })
+      const fake = { configKey: await resolveConfigKey(first), refs: 1 }
+      globals[key] = fake
+      expect(await acquireSharedOtel(second, "2.0.0")).toBe(fake as never)
+      await expect(acquireSharedOtel(other, "2.0.0")).rejects.toThrow("identical telemetry configuration")
+      expect(fake.refs).toBe(2)
+    } finally {
+      globals[key] = previous
+      await rm(dir, { recursive: true, force: true })
     }
   })
 
