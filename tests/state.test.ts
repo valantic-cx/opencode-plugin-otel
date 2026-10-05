@@ -30,7 +30,7 @@ describe("multi-location telemetry", () => {
     }
   })
 
-  test("compares headers helpers by their output instead of their path", async () => {
+  test("allows per-location headers helper paths", async () => {
     const dir = await mkdtemp(join(tmpdir(), "otel-helper-"))
     const helper = async (name: string, token: string) => {
       const path = join(dir, name)
@@ -48,8 +48,8 @@ describe("multi-location telemetry", () => {
       const fake = { configKey: await resolveConfigKey(first), refs: 1 }
       globals[key] = fake
       expect(await acquireSharedOtel(second, "2.0.0")).toBe(fake as never)
-      await expect(acquireSharedOtel(other, "2.0.0")).rejects.toThrow("identical telemetry configuration")
-      expect(fake.refs).toBe(2)
+      expect(await acquireSharedOtel(other, "2.0.0")).toBe(fake as never)
+      expect(fake.refs).toBe(3)
     } finally {
       globals[key] = previous
       await rm(dir, { recursive: true, force: true })

@@ -1,7 +1,6 @@
 import { trace } from "@opentelemetry/api"
 import { logs } from "@opentelemetry/api-logs"
 import { createHash } from "node:crypto"
-import { DynamicHeaders } from "./headers.ts"
 import { createInstruments, forceFlushOtel, setupOtel } from "./otel.ts"
 import type { PluginConfig } from "./config.ts"
 import type { SharedOtel, TracingState } from "./types.ts"
@@ -16,7 +15,7 @@ function globals(): Globals {
   return globalThis as unknown as Globals
 }
 
-export function configKey(config: PluginConfig, helperIdentity = config.otlpHeadersHelper): string {
+export function configKey(config: PluginConfig, helperIdentity = config.otlpHeadersHelper ? "configured" : undefined): string {
   const normalized = JSON.stringify({
     ...config,
     otlpHeadersHelper: helperIdentity,
@@ -29,26 +28,9 @@ export function configKey(config: PluginConfig, helperIdentity = config.otlpHead
   return createHash("sha256").update(normalized).digest("hex")
 }
 
-/**
- * Identifies a headers helper by the headers it returns rather than by its path, so
- * per-project copies of the same helper share one exporter. Falls back to the path
- * when the helper cannot be run.
- */
-async function helperIdentity(helper: string | undefined): Promise<string | undefined> {
-  if (!helper) return undefined
-  try {
-    const headers = new DynamicHeaders({}, helper)
-    await headers.refresh()
-    const entries = Object.entries(headers.current()).sort(([a], [b]) => a.localeCompare(b))
-    return `headers:${createHash("sha256").update(JSON.stringify(entries)).digest("hex")}`
-  } catch {
-    return helper
-  }
-}
-
-/** Resolves the shared-exporter configuration key, running the headers helper if one is set. */
+/** Resolves the shared-exporter configuration key. */
 export async function resolveConfigKey(config: PluginConfig): Promise<string> {
-  return configKey(config, await helperIdentity(config.otlpHeadersHelper))
+  return configKey(config, config.otlpHeadersHelper ? "configured" : undefined)
 }
 
 /** Schedules exporter flushes outside event dispatch and drains them during cleanup. */
