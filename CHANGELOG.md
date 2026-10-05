@@ -1,5 +1,11 @@
 # Changelog
 
+## [2.0.2](https://github.com/valantic-cx/opencode-plugin-otel/compare/v2.0.1...v2.0.2) (2026-10-05)
+
+### Bug Fixes
+
+* allow shared OTel exporters when headers helpers are configured from different plugin locations
+
 ## [2.0.1](https://github.com/valantic-cx/opencode-plugin-otel/compare/v2.0.0...v2.0.1) (2026-10-05)
 
 
