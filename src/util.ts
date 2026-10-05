@@ -196,5 +196,7 @@ export async function contextForSession(
       if (!projectID) return ctx
     }
   }
-  return projectID ? { ...ctx, commonAttrs: { ...ctx.commonAttrs, "project.id": projectID } } : ctx
+  if (!projectID) return ctx
+  const attrs = ctx.tracing.projectAttrs.get(projectID) ?? ctx.commonAttrs
+  return { ...ctx, commonAttrs: { ...attrs, "project.id": projectID } }
 }

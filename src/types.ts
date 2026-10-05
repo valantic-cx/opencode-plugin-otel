@@ -163,6 +163,7 @@ export type TracingState = {
   countedSessions: Set<string>
   countedMessages: Set<string>
   sessionProjects: Map<string, string>
+  projectAttrs: Map<string, CommonAttrs>
   sessionIdentity: Map<string, SessionIdentity>
   stepOutputs: Map<string, Map<number, string>>
   pendingPrompts: Map<string, PendingPrompt[]>

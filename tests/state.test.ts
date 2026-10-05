@@ -27,6 +27,23 @@ describe("multi-location telemetry", () => {
     }
   })
 
+  test("allows locations with different spanAttributes to share exporters", () => {
+    const first = loadConfig({ enabled: true, spanAttributes: "team=alpha" })
+    const second = loadConfig({ enabled: true, spanAttributes: "team=beta,env=prod" })
+    expect(configKey(first)).toBe(configKey(second))
+  })
+
+  test("applies each project's spanAttributes to its own sessions", async () => {
+    const { ctx } = makeCtx()
+    const base: HandlerContext = { ...ctx, commonAttrs: { team: "alpha" } }
+    ctx.tracing.projectAttrs.set("project-one", { team: "alpha" })
+    ctx.tracing.projectAttrs.set("project-two", { team: "beta", env: "prod" })
+    const projectFor = async (id: string) => ({ projectID: id === "one" ? "project-one" : id === "two" ? "project-two" : "project-three", time: { created: 100 } })
+    expect((await contextForSession("one", base, projectFor)).commonAttrs).toEqual({ team: "alpha", "project.id": "project-one" })
+    expect((await contextForSession("two", base, projectFor)).commonAttrs).toEqual({ team: "beta", env: "prod", "project.id": "project-two" })
+    expect((await contextForSession("three", base, projectFor)).commonAttrs).toEqual({ team: "alpha", "project.id": "project-three" })
+  })
+
   test("attributes observed sessions to their own projects", async () => {
     const { ctx } = makeCtx()
     const base: HandlerContext = { ...ctx, commonAttrs: { team: "platform" } }

@@ -96,11 +96,19 @@ export async function setup(ctx: OpenCodeContext): Promise<() => Promise<void>> 
     await log("warn", "invalid OPENCODE_TRACEPARENT ignored", { traceparentLength: config.traceparent.length })
   }
 
+  const commonAttrs = parseAttributePairs(config.spanAttributes)
+  const projectID = ctx.location.project.id
+  const registered = tracing.projectAttrs.get(projectID)
+  if (registered && JSON.stringify(registered) !== JSON.stringify(commonAttrs)) {
+    await log("warn", "conflicting spanAttributes for the same project; the latest location wins", { projectID })
+  }
+  tracing.projectAttrs.set(projectID, commonAttrs)
+
   const hctx: HandlerContext = {
     log,
     emitLog,
     instruments: shared.instruments,
-    commonAttrs: parseAttributePairs(config.spanAttributes),
+    commonAttrs,
     disabledMetrics: config.disabledMetrics,
     disabledTraces: config.disabledTraces,
     tracer: shared.tracer,
@@ -259,6 +267,7 @@ export async function setup(ctx: OpenCodeContext): Promise<() => Promise<void>> 
     controller.abort()
     await running.catch(() => {})
     await flush.drain()
+    if (tracing.projectAttrs.get(projectID) === commonAttrs) tracing.projectAttrs.delete(projectID)
     await releaseSharedOtel()
   }
 }

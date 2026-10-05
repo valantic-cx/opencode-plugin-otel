@@ -22,6 +22,7 @@ export function configKey(config: PluginConfig): string {
     disabledTraces: [...config.disabledTraces].sort(),
     tracePropagationProviders: [...config.tracePropagationProviders].sort(),
     logLevel: undefined,
+    spanAttributes: undefined,
   })
   return createHash("sha256").update(normalized).digest("hex")
 }
@@ -124,6 +125,7 @@ export function acquireTracingState(): TracingState {
       countedSessions: new Set(),
       countedMessages: new Set(),
       sessionProjects: new Map(),
+      projectAttrs: new Map(),
       sessionIdentity: new Map(),
       stepOutputs: new Map(),
       pendingPrompts: new Map(),

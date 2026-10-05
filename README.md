@@ -127,7 +127,10 @@ The plugin reads its settings from `OPENCODE_*` environment variables and/or fro
 When OpenCode loads multiple locations in one process, all enabled instances must
 use identical telemetry configuration. A conflicting endpoint, authentication,
 resource attribute, metric prefix, or signal option fails setup rather than
-exporting one location's data using another location's settings. Event attributes
+exporting one location's data using another location's settings. `spanAttributes`
+is the exception: each location may set its own, and they are applied to sessions
+of that location's project. If two locations of the same project disagree, the most
+recently loaded one wins and a warning is logged. Event attributes
 use the observed session's project ID when available. Shared event processing is
 serialized so an asynchronous session lookup cannot reorder step start/end events.
 
