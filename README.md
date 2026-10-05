@@ -18,38 +18,10 @@ An [opencode](https://opencode.ai) plugin that exports telemetry via OpenTelemet
 
 ## Differences from upstream
 
-Compared with [`@devtheops/opencode-plugin-otel`](https://github.com/DEVtheOPS/opencode-plugin-otel):
-
-| Aspect | Upstream | This fork |
-| --- | --- | --- |
-| npm package | `@devtheops/opencode-plugin-otel` | `@valantic-cx/opencode-plugin-otel` |
-| Plugin id | `devtheops.otel` | `valantic-cx.otel` |
-| OpenCode support | V2 on `main`, V1 on the `v1` branch (`1.x`) | V2 (`>=2`) only |
-| `spanAttributes` across projects | Must be identical for every location in one OpenCode process | May differ per project |
-
-**Per-project `spanAttributes`.** When one OpenCode process serves several projects, upstream
-rejects a second location whose `spanAttributes` differ with "OpenCode OTel plugin instances must
-use identical telemetry configuration". This fork excludes `spanAttributes` from that check and applies
-each project's attributes to that project's sessions, so every project can tag its telemetry in its own
-`opencode.json`:
-
-```json
-{
-  "plugins": [
-    {
-      "package": "@valantic-cx/opencode-plugin-otel",
-      "options": { "enabled": true, "spanAttributes": "customer.name=valantic,project.name=webshop" }
-    }
-  ]
-}
-```
-
-Exporter settings (endpoint, headers, resource attributes, metric prefix, signal options) must still be
-identical across locations. If two locations of the same project set different `spanAttributes`, the
-most recently loaded one wins and a warning is logged.
-
-Because the plugin id differs, the fork can be installed alongside the upstream package, but enabling
-both exports every signal twice.
+This fork of [`@devtheops/opencode-plugin-otel`](https://github.com/DEVtheOPS/opencode-plugin-otel)
+supports OpenCode V2 only and allows each project to set its own `spanAttributes` (for example
+`customer.name=valantic,project.name=webshop`) when one OpenCode process serves several projects.
+Upstream requires identical `spanAttributes` for all of them.
 
 - [Differences from upstream](#differences-from-upstream)
 - [OpenCode compatibility](#opencode-compatibility)
