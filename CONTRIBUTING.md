@@ -8,7 +8,7 @@
 ## Getting started
 
 ```bash
-git clone https://github.com/devtheops/opencode-plugin-otel
+git clone https://github.com/valantic-cx/opencode-plugin-otel
 cd opencode-plugin-otel
 bun install
 ```
@@ -26,8 +26,7 @@ OpenCode V2 discovers the directory automatically and loads TypeScript via Bun, 
 there is no build step during development. A `plugins` entry pointing directly to
 an absolute `.ts` file is rejected by OpenCode `2.0.1`.
 
-> **Branching:** `main` targets OpenCode V2. The OpenCode V1 plugin is maintained on the `v1` branch
-> (branched from the last `1.x` tag) — open V1 bug/security fixes against `v1`, not `main`.
+> **Target:** `main` targets OpenCode V2 (`>=2`) only.
 
 ## Commands
 
@@ -126,12 +125,12 @@ chore(deps): bump @opentelemetry/api to 1.10.0
 Releases are handled via GitHub Actions. See [the release workflow](.github/workflows/release.yml). To cut a release, push a version tag:
 
 ```bash
-git tag v1.2.3
-git push origin v1.2.3
+git tag v2.1.0
+git push origin v2.1.0
 ```
 
 The version bump should follow [SemVer](https://semver.org) based on the commits since the last release:
 
-- `fix` commits → patch (`1.0.x`)
-- `feat` commits → minor (`1.x.0`)
+- `fix` commits → patch (`2.0.x`)
+- `feat` commits → minor (`2.x.0`)
 - `BREAKING CHANGE` commits → major (`x.0.0`)

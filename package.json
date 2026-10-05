@@ -1,7 +1,7 @@
 {
-  "author": "DEVtheOPS",
+  "author": "valantic CX",
   "bugs": {
-    "url": "https://github.com/DEVtheOPS/opencode-plugin-otel/issues"
+    "url": "https://github.com/valantic-cx/opencode-plugin-otel/issues"
   },
   "dependencies": {
     "@arizeai/openinference-semantic-conventions": "^2.2.0",
@@ -44,7 +44,7 @@
   "files": [
     "dist/"
   ],
-  "homepage": "https://github.com/DEVtheOPS/opencode-plugin-otel#readme",
+  "homepage": "https://github.com/valantic-cx/opencode-plugin-otel#readme",
   "keywords": [
     "opentelemetry",
     "otel",
@@ -56,7 +56,7 @@
   "license": "MPL-2.0",
   "main": "dist/index.js",
   "module": "dist/index.js",
-  "name": "@devtheops/opencode-plugin-otel",
+  "name": "@valantic-cx/opencode-plugin-otel",
   "oc-plugin": [
     "server"
   ],
@@ -73,7 +73,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/DEVtheOPS/opencode-plugin-otel.git"
+    "url": "https://github.com/valantic-cx/opencode-plugin-otel.git"
   },
   "scripts": {
     "build": "bun build src/index.ts --outdir=./dist --target=node && tsc -p tsconfig.build.json",

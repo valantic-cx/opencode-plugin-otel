@@ -1,20 +1,23 @@
 # opencode-plugin-otel
 
-[![npm version](https://img.shields.io/npm/v/@devtheops/opencode-plugin-otel.svg)](https://www.npmjs.com/package/@devtheops/opencode-plugin-otel)
-[![npm downloads](https://img.shields.io/npm/dm/@devtheops/opencode-plugin-otel.svg)](https://www.npmjs.com/package/@devtheops/opencode-plugin-otel)
-[![GitHub stars](https://img.shields.io/github/stars/DEVtheOPS/opencode-plugin-otel.svg)](https://github.com/DEVtheOPS/opencode-plugin-otel/stargazers)
-[![Build status](https://img.shields.io/github/actions/workflow/status/DEVtheOPS/opencode-plugin-otel/release-please.yml?branch=main)](https://github.com/DEVtheOPS/opencode-plugin-otel/actions/workflows/release-please.yml)
+[![npm version](https://img.shields.io/npm/v/@valantic-cx/opencode-plugin-otel.svg)](https://www.npmjs.com/package/@valantic-cx/opencode-plugin-otel)
+[![npm downloads](https://img.shields.io/npm/dm/@valantic-cx/opencode-plugin-otel.svg)](https://www.npmjs.com/package/@valantic-cx/opencode-plugin-otel)
+[![GitHub stars](https://img.shields.io/github/stars/valantic-cx/opencode-plugin-otel.svg)](https://github.com/valantic-cx/opencode-plugin-otel/stargazers)
+[![Build status](https://img.shields.io/github/actions/workflow/status/valantic-cx/opencode-plugin-otel/release-please.yml?branch=main)](https://github.com/valantic-cx/opencode-plugin-otel/actions/workflows/release-please.yml)
 [![Discord notifications](https://img.shields.io/badge/discord-notifications-5865F2?logo=discord&logoColor=white)](https://discord.gg/zavuskz8xB)
-[![License](https://img.shields.io/npm/l/@devtheops/opencode-plugin-otel.svg)](https://github.com/DEVtheOPS/opencode-plugin-otel/blob/main/LICENSE)
+[![License](https://img.shields.io/npm/l/@valantic-cx/opencode-plugin-otel.svg)](https://github.com/valantic-cx/opencode-plugin-otel/blob/main/LICENSE)
+
+> **Fork notice.** `@valantic-cx/opencode-plugin-otel` is a fork of
+> [`@devtheops/opencode-plugin-otel`](https://github.com/DEVtheOPS/opencode-plugin-otel) by DEVtheOPS,
+> published under the MPL-2.0 license.
 
 An [opencode](https://opencode.ai) plugin that exports telemetry via OpenTelemetry (OTLP over gRPC or HTTP/protobuf), mirroring the same signals as [Claude Code's monitoring](https://code.claude.com/docs/en/monitoring-usage).
 
-> **OpenCode V2 only.** Version `2.x` of this plugin targets **OpenCode `>=2`** and exports the V2
-> `Plugin.define`-style default export (`id: "devtheops.otel"`). The OpenCode V1 plugin is maintained
-> on the [`v1` branch](https://github.com/DEVtheOPS/opencode-plugin-otel/tree/v1) and the `1.x` release
-> line. See [OpenCode version support](#opencode-version-support).
+> **OpenCode V2 only.** This plugin targets **OpenCode `>=2`** and exports the V2
+> `Plugin.define`-style default export (`id: "valantic-cx.otel"`). See
+> [OpenCode compatibility](#opencode-compatibility).
 
-- [OpenCode version support](#opencode-version-support)
+- [OpenCode compatibility](#opencode-compatibility)
 - [What it instruments](#what-it-instruments)
   - [Metrics](#metrics)
   - [Log events](#log-events)
@@ -36,28 +39,18 @@ An [opencode](https://opencode.ai) plugin that exports telemetry via OpenTelemet
 - [Local development](#local-development)
 - [GitHub Discord notifications](#github-discord-notifications)
 
-## OpenCode version support
+## OpenCode compatibility
 
-| Plugin line | OpenCode | Config key | Entrypoint |
-|-------------|----------|------------|------------|
-| `2.x` (`main`) | V2 (`>=2`) | `plugins` | default export `{ id, setup }` |
-| `1.x` (`v1` branch) | V1 | `plugin` | named `OtelPlugin` export |
-
-OpenCode V2 replaced the coarse V1 message events (`message.updated`, `message.part.updated`)
-and removed `command.executed` and `session.diff` from the plugin event stream. It provides
-`permission.asked` / `permission.replied` in place of V1's `permission.updated` / `permission.replied`,
-plus a granular session taxonomy
+The plugin requires OpenCode `>=2`, is registered under the `plugins` config key, and exports a
+default `{ id, setup }` plugin definition. It consumes the granular V2 session event stream
 (`session.execution.*`, `session.step.*`, `session.tool.*`, `session.usage.updated`,
-`session.retry.scheduled`). This plugin consumes the V2 stream directly, which produces more
-accurate LLM and tool span timings than the V1 implementation.
-
-**V1 signal parity:** `lines_of_code.count` / `lines_of_code.total` relied on the V1
-`session.diff` event and are not emitted. The V2 client has a session-diff endpoint,
-but the V2 plugin context does not expose it; the VCS diff API is repository-scoped
-and is not an equivalent per-session total. `command.executed` instrumentation is
-replaced by successful shell-tool completion. Message/part spans are replaced by
-per-step LLM spans; completed text segments still populate `output.value` and
+`session.retry.scheduled`) plus `permission.asked` / `permission.replied`, and emits per-step LLM
+spans and tool spans from those events. Completed text segments populate `output.value` and
 `llm.output_messages`.
+
+`lines_of_code.count` / `lines_of_code.total` are not emitted: the V2 plugin context does not expose a
+per-session diff, and the VCS diff API is repository-scoped rather than an equivalent per-session
+total. Shell commands are tracked through successful shell-tool completion.
 
 When V2 provides an unambiguous child session ID through subagent tool progress or result metadata,
 subagent run spans nest under the dispatch tool span. Ambiguous or missed correlations fall back to
@@ -105,7 +98,7 @@ Add the plugin to your opencode config at `~/.config/opencode/opencode.json`:
 ```json
 {
   "$schema": "https://opencode.ai/config.json",
-  "plugins": ["@devtheops/opencode-plugin-otel"]
+  "plugins": ["@valantic-cx/opencode-plugin-otel"]
 }
 ```
 
@@ -169,7 +162,7 @@ Every setting can also be passed inline through opencode's plugin **object form*
   "$schema": "https://opencode.ai/config.json",
   "plugins": [
     {
-      "package": "@devtheops/opencode-plugin-otel",
+      "package": "@valantic-cx/opencode-plugin-otel",
       "options": {
         "enabled": true,
         "endpoint": "http://localhost:4317",
@@ -424,7 +417,7 @@ This repo includes a reusable workflow at `.github/workflows/discord-notify.yml`
 
 Set an org or repo secret named `DISCORD_WEBHOOK` and the workflow will post to that webhook automatically.
 
-To reuse it from another repository in the `DEVtheOPS` org:
+To reuse it from another repository in the `valantic-cx` org:
 
 ```yaml
 name: Discord Events
@@ -439,7 +432,7 @@ on:
 
 jobs:
   notify-discord:
-    uses: DEVtheOPS/opencode-plugin-otel/.github/workflows/discord-notify.yml@main
+    uses: valantic-cx/opencode-plugin-otel/.github/workflows/discord-notify.yml@main
     with:
       username: DEVtheOPS Bot
       title_prefix: "[DEVtheOPS]"
